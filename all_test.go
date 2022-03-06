@@ -34,16 +34,16 @@ var simpleJson = []byte(`{
 
 func TestNestedArrayValue(t *testing.T) {
 	m := MapFromBytes(simpleJson)
-	i, err := m.Map("object").Array("nestedArrayKey").Array(0).Int(2)
+	i, err := m.Map("object").Array("nestedArrayKey").Array(0).Float(2)
 	require.NoError(t, err)
-	require.Equal(t, 5, i)
+	require.Equal(t, 5.0, i)
 }
 
 func TestNestedArrayBadIndex(t *testing.T) {
 	m := MapFromBytes(simpleJson)
-	i, err := m.Map("object").Array("nestedArrayKey").Array(1).Int(2)
+	i, err := m.Map("object").Array("nestedArrayKey").Array(1).Float(2)
 	require.Error(t, err)
-	require.Equal(t, 0, i)
+	require.Equal(t, 0.0, i)
 }
 
 func TestMissingArrayLen(t *testing.T) {
