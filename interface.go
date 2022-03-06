@@ -1,7 +1,9 @@
 package json
 
 type Serializer interface {
+	// Bytes returns the serialized value into a slice of bytes, or a propagated error
 	Bytes() ([]byte, error)
+	// MustBytes returns the serialized value into a slice of bytes, or panics if there was an error
 	MustBytes() []byte
 }
 
