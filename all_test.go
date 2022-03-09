@@ -1,6 +1,9 @@
 package json
 
 import (
+	ejson "encoding/json"
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,7 +13,6 @@ var simpleJson = []byte(`{
 	"object": {
 		"strKey": "strValue",
 		"boolKey": true,
-		"intKey": 42,
 		"floatKey": 1.21,
 		"arrayObjKey": [
 			{
@@ -20,30 +22,42 @@ var simpleJson = []byte(`{
 				"val": 2
 			}
 		],
-		"nestedArrayKey": [
+		"nestedArrayFloatKey": [
 			[
-				3, 4, 5
+				3, 4.1
 			]
 		],
 		"arrayStrKey": [
-			"str1",
-			"str2"
+			"str1", "str2"
 		]
 	}
 }`)
 
-func TestNestedArrayValue(t *testing.T) {
+func TestNestedArrayFloatValue(t *testing.T) {
 	m := MapFromBytes(simpleJson)
-	i, err := m.Map("object").Array("nestedArrayKey").Array(0).Float(2)
+	i, err := m.Map("object").Array("nestedArrayFloatKey").Array(0).Float(1)
 	require.NoError(t, err)
-	require.Equal(t, 5.0, i)
+	require.Equal(t, 4.1, i)
 }
 
-func TestNestedArrayBadIndex(t *testing.T) {
+func TestNestedArrayFloatBadIndex(t *testing.T) {
 	m := MapFromBytes(simpleJson)
-	i, err := m.Map("object").Array("nestedArrayKey").Array(1).Float(2)
+	i, err := m.Map("object").Array("nestedArrayFloatKey").Array(1).Float(2)
 	require.Error(t, err)
 	require.Equal(t, 0.0, i)
+}
+
+func TestArrayLen(t *testing.T) {
+	m := MapFromBytes(simpleJson)
+	l, err := m.Map("object").Array("arrayStrKey").Len()
+	require.NoError(t, err)
+	require.Equal(t, 2, l)
+}
+
+func TestArrayMustLen(t *testing.T) {
+	m := MapFromBytes(simpleJson)
+	l := m.Map("object").Array("arrayStrKey").MustLen()
+	require.Equal(t, 2, l)
 }
 
 func TestMissingArrayLen(t *testing.T) {
@@ -101,7 +115,39 @@ func TestReadme(t *testing.T) {
         }
     ]
 }`)
-	score, err := MapFromBytes(data).Array("people").Map(0).Float("score")
+	score, err := func() (float64, error) {
+		var dataMap map[string]interface{}
+		err := ejson.Unmarshal(data, &dataMap)
+		if err != nil {
+			return 0.0, err
+		}
+		peopleObj, ok := dataMap["people"] // peopleObj is a `[]interface{}`
+		if !ok {
+			return 0.0, errors.New("people key not found")
+		}
+		peopleArray, ok := peopleObj.([]interface{})
+		if len(peopleArray) == 0 {
+			return 0.0, errors.New("no people found")
+		}
+		firstPerson := peopleArray[0] // firstPerson is an `interface{}`
+		firstPersonMap, ok := firstPerson.(map[string]interface{})
+		if !ok {
+			return 0.0, fmt.Errorf("first person should be a map[string]interface{}, but is a %T", firstPerson)
+		}
+		firstPersonScore, ok := firstPersonMap["score"] // firstPersonScore is an `interface{}`
+		if !ok {
+			return 0.0, fmt.Errorf("score not found")
+		}
+		score, ok := firstPersonScore.(float64)
+		if !ok {
+			return 0.0, fmt.Errorf("score should be a float64, but is a %T", score)
+		}
+		return score, nil
+	}()
+	require.NoError(t, err)
+	require.Equal(t, 89.5, score)
+
+	score, err = MapFromBytes(data).Array("people").Map(0).Float("score")
 	require.NoError(t, err)
 	require.Equal(t, score, 89.5)
 
