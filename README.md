@@ -73,16 +73,17 @@ if !ok {
 ```
 
 Phew!  That was a lot of code to get one little value out of a tiny JSON.  Is it possible to write this more concisely
-but retain the all the validation that guards us against the data not being in the expected format.
+but retain the all the validation that guards us against the data not being in the expected format?
 
-## Let's see how it works now...
+## Simple Code Without Sacrifice
 
-For the happy day scenario, let's get parse the JSON, and get the score of the first person in the people array...
+Using this library, here's how you would pull out the same value and still include all the useful validation done
+above...
 
 ```go
 score, err := json.MapFromBytes(data).Array("people").Map(0).Float("score")
 if err != nil {
-    // no error in this case, but nice to only check once at the very end!
+    return err
 }
 fmt.Printf("Alice's score: %f\n", score)
 ```
@@ -105,22 +106,26 @@ Uh oh! key not found: entries, valid keys: people
 
 Well that's much cleaner!  And we didn't have to do annoying type casting from `interface{}` or error checking along the
 way. Just check once when you pull out the value and if any of the errors that we checked for in the old code happened,
-they will be propagated to the final call to get the values out of the JSON.
+they will be propagated to the final call to get the values out of the JSON.  As a bonus convenience, the error message
+conveniently contains the valid keys at the level where the error was found!
 
 ### Wow! How did that work?
 
 Actually, it's not that complicated.  Whenever you call `.Array(...)` or `.Map(...)` with an invalid index or key, it
 returns a struct that holds on to that error and finally returns it when you call one of the other functions
-like `Float(...)`.
+like `Float(...)`.  This lets you write nice clean code without worrying about `"invalid memory address or nil pointer
+dereference"` panics.
 
 ### But I really hate checking for errors... now what?
 
-OK, what if you're confident the value is there, need to send it to another function, and are willing to let it panic
-if something went wrong?  That's what the `Must*` versions of all the functions that return errors are for!
+OK, what if you're really confident the value is there, need to send it to another function, and are willing to let it
+panic if something went wrong?  That's what the `Must*` versions of all the functions that return errors are for!
 
 ```go
 processScore(json.MapFromBytes(data).Array("people").Map(0).MustFloat("score"))
 ```
+
+Even with this approach, the panic will contain the same useful information you would get using the other methods.
 
 ### So what's the full interface?
 
