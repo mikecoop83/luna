@@ -48,14 +48,14 @@ if err != nil {
 }
 peopleObj, ok := dataMap["people"] // peopleObj is an `interface{}`
 if !ok {
-	return errors.New("people key not found")
+	return fmt.Errorf("people key not found")
 }
 peopleArray, ok := peopleObj.([]interface{})
 if !ok {
-	return errors.New("people should be a []interface{}, but is a %T", peopleArray)
+	return fmt.Errorf("people should be a []interface{}, but is a %T", peopleArray)
 }
 if len(peopleArray) == 0 {
-	return errors.New("no people found")
+	return fmt.Errorf("no people found")
 }
 firstPerson := peopleObj[0] // firstPerson is an `interface{}`
 firstPersonMap, ok := firstPerson.(map[string]interface{})
