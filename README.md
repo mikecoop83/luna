@@ -106,7 +106,7 @@ Uh oh! key 'grade' not found at path $['people'][0], valid keys: name, score, fr
 
 Well that's much cleaner!  And we didn't have to do annoying type casting from `interface{}` or error checking along the
 way. Just check once when you pull out the value and if any of the errors that we checked for in the old code happened,
-they will be propagated to the final call to get the values out of the JSON.  As a bonus convenience, the error message
+they will be propagated to the final call to get the values out of the JSON.  As a bonus, the error message
 conveniently contains the full path to where the error happened along with the valid keys at that path!
 
 ### Wow! How did that work?
