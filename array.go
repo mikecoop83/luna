@@ -8,8 +8,9 @@ import (
 
 // Array provides methods to either navigate through the content of a JSON array or propagate any error that has occurred
 type Array struct {
-	a   []interface{}
-	err error
+	a    []interface{}
+	path path
+	err  error
 }
 
 // ArrayFromBytes creates an Array from a []byte
@@ -17,7 +18,7 @@ func ArrayFromBytes(jsonBytes []byte) Array {
 	var a Array
 	err := json.Unmarshal(jsonBytes, &a.a)
 	if err != nil {
-		return Array{nil, err}
+		return Array{nil, "$", err}
 	}
 	return a
 }
@@ -27,14 +28,14 @@ func ArrayFromReader(r io.Reader) Array {
 	var a Array
 	err := json.NewDecoder(r).Decode(&a.a)
 	if err != nil {
-		return Array{nil, err}
+		return Array{nil, "$", err}
 	}
 	return a
 }
 
 // NewArray creates an Array from a []interface{}
 func NewArray(a []interface{}) Array {
-	return Array{a, nil}
+	return Array{a, "$", nil}
 }
 
 func (a Array) validateIndex(idx int) error {
@@ -47,20 +48,22 @@ func (a Array) validateIndex(idx int) error {
 // Map returns the map found at index `idx` in the array; errors will be propagated
 func (a Array) Map(idx int) Map {
 	if a.err != nil {
-		return Map{nil, a.err}
+		return Map{nil, a.path, a.err}
 	}
 	err := a.validateIndex(idx)
 	if err != nil {
-		return Map{nil, err}
+		return Map{nil, a.path, err}
 	}
+	currPath := a.path.appendIndex(idx)
 	m, ok := a.a[idx].(map[string]interface{})
 	if !ok {
 		return Map{
 			nil,
-			fmt.Errorf("item at index %d was a %T, not a map", idx, a.a[idx]),
+			a.path,
+			fmt.Errorf("item at path %s was a %T, not a map", currPath, a.a[idx]),
 		}
 	}
-	return Map{m, nil}
+	return Map{m, currPath, nil}
 }
 
 // Array returns the array found at index `idx` in the array; errors will be propagated
@@ -70,16 +73,18 @@ func (a Array) Array(idx int) Array {
 	}
 	err := a.validateIndex(idx)
 	if err != nil {
-		return Array{nil, err}
+		return Array{nil, a.path, err}
 	}
+	currPath := a.path.appendIndex(idx)
 	result, ok := a.a[idx].([]interface{})
 	if !ok {
 		return Array{
 			nil,
-			fmt.Errorf("item at index %d was a %T, not an array", idx, a.a[idx]),
+			a.path,
+			fmt.Errorf("item at path %s was a %T, not an array", currPath, a.a[idx]),
 		}
 	}
-	return Array{result, nil}
+	return Array{result, currPath, nil}
 }
 
 // MustLen returns the length of the array, or panics if there was an error

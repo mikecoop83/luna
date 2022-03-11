@@ -9,33 +9,38 @@ import (
 
 // Map provides methods to either navigate through the content of a JSON object or propagate any error that has occurred
 type Map struct {
-	m   map[string]interface{}
-	err error
+	m    map[string]interface{}
+	path path
+	err  error
 }
 
-// MapFromBytes creates an Map from a []byte
+func newMapAtRoot() Map {
+	return Map{path: "$"}
+}
+
+// MapFromBytes creates a Map from a []byte
 func MapFromBytes(jsonBytes []byte) Map {
-	var m Map
+	m := newMapAtRoot()
 	err := json.Unmarshal(jsonBytes, &m.m)
 	if err != nil {
-		return Map{nil, err}
+		return Map{nil, "$", err}
 	}
 	return m
 }
 
-// MapFromReader creates an Map from an io.Reader
+// MapFromReader creates a Map from an io.Reader
 func MapFromReader(r io.Reader) Map {
-	var m Map
+	m := newMapAtRoot()
 	err := json.NewDecoder(r).Decode(&m.m)
 	if err != nil {
-		return Map{nil, err}
+		return Map{nil, "$", err}
 	}
 	return m
 }
 
-// NewMap creates an Map from a []interface{}
+// NewMap creates a Map from a map[string]interface{}
 func NewMap(m map[string]interface{}) Map {
-	return Map{m, nil}
+	return Map{m, "$", nil}
 }
 
 func (m Map) panicOnErr() {
@@ -92,7 +97,7 @@ func (m Map) validateKey(key string) error {
 		for k, _ := range m.m {
 			validKeys = append(validKeys, k)
 		}
-		return fmt.Errorf("key not found: %s, valid keys: %+v", key, strings.Join(validKeys, ", "))
+		return fmt.Errorf("key '%s' not found at path %s, valid keys: %+v", key, m.path, strings.Join(validKeys, ", "))
 	}
 	return nil
 }
@@ -107,7 +112,7 @@ func (m Map) String(key string) (string, error) {
 	}
 	s, ok := m.m[key].(string)
 	if !ok {
-		return "", fmt.Errorf("item with key %s was a %T, not a string", key, m.m[key])
+		return "", fmt.Errorf("item with key '%s' at path %s was a %T, not a string", key, m.path, m.m[key])
 	}
 	return s, nil
 }
@@ -148,28 +153,30 @@ func (m Map) Map(key string) Map {
 		return m
 	}
 	if err := m.validateKey(key); err != nil {
-		return Map{nil, err}
+		return Map{nil, m.path, err}
 	}
+	currPath := m.path.appendKey(key)
 	result, ok := m.m[key].(map[string]interface{})
 	if !ok {
-		return Map{nil, fmt.Errorf("item with key %s was a %T, not a map", key, m.m[key])}
+		return Map{nil, m.path, fmt.Errorf("item at path %s was a %T, not a map", currPath, m.m[key])}
 	}
-	return Map{result, nil}
+	return Map{result, currPath, nil}
 }
 
 // Array returns the array found at key `key` in the map; errors will be propagated
 func (m Map) Array(key string) Array {
 	if m.err != nil {
-		return Array{nil, m.err}
+		return Array{nil, m.path, m.err}
 	}
 	if err := m.validateKey(key); err != nil {
-		return Array{nil, err}
+		return Array{nil, m.path, err}
 	}
+	currPath := m.path.appendKey(key)
 	a, ok := m.m[key].([]interface{})
 	if !ok {
-		return Array{nil, fmt.Errorf("item with key %s was a %T, not an array", key, m.m[key])}
+		return Array{nil, m.path, fmt.Errorf("item at path %s was a %T, not an array", currPath, m.m[key])}
 	}
-	return Array{a, nil}
+	return Array{a, currPath, nil}
 }
 
 // Bytes returns the serialized value into a slice of bytes, or a propagated error

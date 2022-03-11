@@ -92,29 +92,29 @@ fmt.Printf("Alice's score: %f\n", score)
 Alice's score: 89.5
 ```
 
-But what if we got the name of the array wrong and used `"entries"` instead of `"people"`?
+But what if we got the key wrong and used `"grade"` instead of `"score"`?
 ```go
-score, err := json.MapFromBytes(data).Array("entries").Map(0).Float("score")
+score, err := json.MapFromBytes(data).Array("people").Map(0).Float("grade")
 if err != nil {
     fmt.Printf("Uh oh! %s\n", err)
 }
 ```
 
 ```
-Uh oh! key not found: entries, valid keys: people
+Uh oh! key 'grade' not found at path $['people'][0], valid keys: name, score, friends, deleted
 ```
 
 Well that's much cleaner!  And we didn't have to do annoying type casting from `interface{}` or error checking along the
 way. Just check once when you pull out the value and if any of the errors that we checked for in the old code happened,
 they will be propagated to the final call to get the values out of the JSON.  As a bonus convenience, the error message
-conveniently contains the valid keys at the level where the error was found!
+conveniently contains the full path to where the error happened along with the valid keys at that path!
 
 ### Wow! How did that work?
 
 Actually, it's not that complicated.  Whenever you call `.Array(...)` or `.Map(...)` with an invalid index or key, it
 returns a struct that holds on to that error and finally returns it when you call one of the other functions
-like `Float(...)`.  This lets you write nice clean code without worrying about `"invalid memory address or nil pointer
-dereference"` panics.
+like `Float(...)`. Meanwhile, it also builds up and keeps track of the path so that if any error does happen, you'll
+know exactly where to look!
 
 ### But I really hate checking for errors... now what?
 

@@ -98,6 +98,13 @@ func TestString(t *testing.T) {
 	require.Equal(t, "strValue", s)
 }
 
+func TestBadPath(t *testing.T) {
+	m := MapFromBytes(simpleJson)
+	_, err := m.Map("object").Array("arrayObjKey").Map(0).Bool("invalid")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "$['object']['arrayObjKey'][0]")
+}
+
 func TestReadme(t *testing.T) {
 	data := []byte(`{
     "people": [
@@ -151,10 +158,9 @@ func TestReadme(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, score, 89.5)
 
-	score, err = MapFromBytes(data).Array("entries").Map(0).Float("score")
+	_, err = MapFromBytes(data).Array("people").Map(0).Float("grade")
 	require.Error(t, err)
 	// make sure it provides the bad key
-	require.Contains(t, err.Error(), "entries")
-	// and the good one too
-	require.Contains(t, err.Error(), "people")
+	require.Contains(t, err.Error(), "key 'grade' not found at path $['people'][0]")
+	require.Contains(t, err.Error(), "score")
 }
