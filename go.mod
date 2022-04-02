@@ -1,4 +1,4 @@
-module github.com/mikecoop83/json
+module github.com/mikecoop83/go-json
 
 go 1.17
 
