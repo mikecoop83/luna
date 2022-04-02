@@ -1,4 +1,4 @@
-# go-json  - Easier Parsing of Unstructured JSON in Go
+# luna - Easier Parsing of Unstructured JSON in Go
 ___
 
 ## Goal
@@ -81,7 +81,7 @@ Using this library, here's how you would pull out the same value and still inclu
 above...
 
 ```go
-score, err := json.MapFromBytes(data).Array("people").Map(0).Float("score")
+score, err := luna.MapFromBytes(data).Array("people").Map(0).Float("score")
 if err != nil {
     return err
 }
@@ -94,7 +94,7 @@ Alice's score: 89.5
 
 But what if we got the key wrong and used `"grade"` instead of `"score"`?
 ```go
-score, err := json.MapFromBytes(data).Array("people").Map(0).Float("grade")
+score, err := luna.MapFromBytes(data).Array("people").Map(0).Float("grade")
 if err != nil {
     fmt.Printf("Uh oh! %s\n", err)
 }
@@ -122,7 +122,7 @@ OK, what if you're really confident the value is there, need to send it to anoth
 panic if something went wrong?  That's what the `Must*` versions of all the functions that return errors are for!
 
 ```go
-processScore(json.MapFromBytes(data).Array("people").Map(0).MustFloat("score"))
+processScore(luna.MapFromBytes(data).Array("people").Map(0).MustFloat("score"))
 ```
 
 Even with this approach, the panic will contain the same useful information you would get using the other methods.
