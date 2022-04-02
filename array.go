@@ -167,6 +167,14 @@ func (a Array) MustBytes() []byte {
 	return result
 }
 
+// Inner returns the `[]interface{}` which this `Array` represents, or a propagated error
+func (a Array) Inner() ([]interface{}, error) {
+	if a.err != nil {
+		return nil, a.err
+	}
+	return a.a, nil
+}
+
 // MustInner returns the `[]interface{}` which this `Array` represents, or panics if there was an error
 func (a Array) MustInner() []interface{} {
 	if a.err != nil {

@@ -1,4 +1,4 @@
-# json
+# luna
 
 ## Types
 
@@ -26,7 +26,7 @@ Bool returns the value of a bool at index `idx` in the array, or a propagated er
 
 Bytes returns the serialized value into a slice of bytes, or a propagated error
 
-#### func (Array) [Err](/array.go#L223)
+#### func (Array) [Err](/array.go#L231)
 
 `func (a Array) Err() error`
 
@@ -38,7 +38,13 @@ Err returns any error that was found up to this point
 
 Float returns the value of a float at index `idx` in the array, or a propagated error
 
-#### func (Array) [Len](/array.go#L179)
+#### func (Array) [Inner](/array.go#L171)
+
+`func (a Array) Inner() ([]interface{ ... }, error)`
+
+Inner returns the `[]interface{}` which this `Array` represents, or a propagated error
+
+#### func (Array) [Len](/array.go#L187)
 
 `func (a Array) Len() (int, error)`
 
@@ -50,7 +56,7 @@ Len returns the length of the array, or a propagated error
 
 Map returns the map found at index `idx` in the array; errors will be propagated
 
-#### func (Array) [MustBool](/array.go#L211)
+#### func (Array) [MustBool](/array.go#L219)
 
 `func (a Array) MustBool(idx int) bool`
 
@@ -62,13 +68,13 @@ MustBool returns the value of a bool at index `idx` in the array, or panics if t
 
 MustBytes returns the serialized value into a slice of bytes, or panics if there was an error
 
-#### func (Array) [MustFloat](/array.go#L199)
+#### func (Array) [MustFloat](/array.go#L207)
 
 `func (a Array) MustFloat(idx int) float64`
 
 MustFloat returns the value of a float at index `idx` in the array, or panics if there was an error
 
-#### func (Array) [MustInner](/array.go#L171)
+#### func (Array) [MustInner](/array.go#L179)
 
 `func (a Array) MustInner() []interface{ ... }`
 
@@ -80,7 +86,7 @@ MustInner returns the `[]interface{}` which this `Array` represents, or panics i
 
 MustLen returns the length of the array, or panics if there was an error
 
-#### func (Array) [MustString](/array.go#L187)
+#### func (Array) [MustString](/array.go#L195)
 
 `func (a Array) MustString(idx int) string`
 
