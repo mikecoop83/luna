@@ -1,4 +1,4 @@
-package json
+package luna
 
 import (
 	"encoding/json"
