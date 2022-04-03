@@ -109,6 +109,22 @@ way. Just check once when you pull out the value and if any of the errors that w
 they will be propagated to the final call to get the values out of the JSON.  As a bonus, the error message
 conveniently contains the full path to where the error happened along with the valid keys at that path!
 
+As another example, showing the power of the error propagation, what if we got the `people` key wrong and used `folks`?
+
+But what if we got the key wrong and used `"grade"` instead of `"score"`?
+```go
+score, err := luna.MapFromBytes(data).Array("folks").Map(0).Float("grade")
+if err != nil {
+    fmt.Printf("Uh oh! %s\n", err)
+}
+```
+
+```
+Uh oh! key 'folks' not found at path $, valid keys: people
+```
+
+Even though the error occurred earlier on in the chained calls, we still see the original error!
+
 ### Wow! How did that work?
 
 Actually, it's not that complicated.  Whenever you call `.Array(...)` or `.Map(...)` with an invalid index or key, it

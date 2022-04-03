@@ -163,4 +163,10 @@ func TestReadme(t *testing.T) {
 	// make sure it provides the bad key
 	require.Contains(t, err.Error(), "key 'grade' not found at path $['people'][0]")
 	require.Contains(t, err.Error(), "score")
+
+	_, err = MapFromBytes(data).Array("folks").Map(0).Float("grade")
+	require.Error(t, err)
+	// make sure it provides the bad key
+	require.Contains(t, err.Error(), "key 'folks' not found at path $")
+	require.Contains(t, err.Error(), "people")
 }
