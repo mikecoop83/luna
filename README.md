@@ -1,9 +1,9 @@
-# luna - Easier Parsing of Unstructured JSON in Go
+# Better Parsing of Unstructured JSON in Go
 ___
 
 ## Goal
 
-The intent of this library is to create an easier interface to work with when parsing JSON in Go without having to
+The intent of **luna** is to create an simpler interface to work with when parsing JSON in Go without having to
 create a bunch of structs with tags.
 
 Features include:
