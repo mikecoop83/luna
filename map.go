@@ -92,7 +92,11 @@ func (m Map) Err() error {
 }
 
 func (m Map) validateKey(key string) error {
-	if !m.MustHas(key) {
+	hasKey, err := m.Has(key)
+	if err != nil {
+		return err
+	}
+	if !hasKey {
 		validKeys := make([]string, 0, len(m.m))
 		for k, _ := range m.m {
 			validKeys = append(validKeys, k)
@@ -202,9 +206,7 @@ func (m Map) Has(key string) (bool, error) {
 
 // MustBytes returns the serialized value into a slice of bytes, or panics if there was an error
 func (m Map) MustBytes() []byte {
-	if m.err != nil {
-		panic(m.err)
-	}
+	m.panicOnErr()
 	result, err := json.Marshal(m.m)
 	if err != nil {
 		panic(err)
@@ -222,8 +224,6 @@ func (m Map) Inner() (map[string]interface{}, error) {
 
 // MustInner returns the `[]interface{}` which this `Array` represents, or panics if there was an error
 func (m Map) MustInner() map[string]interface{} {
-	if m.err != nil {
-		panic(m.err)
-	}
+	m.panicOnErr()
 	return m.m
 }
