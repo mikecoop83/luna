@@ -49,43 +49,6 @@ func (m Map) panicOnErr() {
 	}
 }
 
-// MustHas returns true if the map contains the key `key`, or panics if there was an error
-func (m Map) MustHas(key string) bool {
-	m.panicOnErr()
-	_, ok := m.m[key]
-	return ok
-}
-
-// MustString returns the value of a string at key `key` in the map, or panics if there was an error
-func (m Map) MustString(key string) string {
-	m.panicOnErr()
-	s, err := m.String(key)
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
-
-// MustFloat returns the value of a float at key `key` in the map, or panics if there was an error
-func (m Map) MustFloat(key string) float64 {
-	m.panicOnErr()
-	f, err := m.Float(key)
-	if err != nil {
-		panic(err)
-	}
-	return f
-}
-
-// MustBool returns the value of a bool at key `key` in the map, or panics if there was an error
-func (m Map) MustBool(key string) bool {
-	m.panicOnErr()
-	b, err := m.Bool(key)
-	if err != nil {
-		panic(err)
-	}
-	return b
-}
-
 // Err returns any error that was found up to this point
 func (m Map) Err() error {
 	return m.err
@@ -204,26 +167,10 @@ func (m Map) Has(key string) (bool, error) {
 	return ok, nil
 }
 
-// MustBytes returns the serialized value into a slice of bytes, or panics if there was an error
-func (m Map) MustBytes() []byte {
-	m.panicOnErr()
-	result, err := json.Marshal(m.m)
-	if err != nil {
-		panic(err)
-	}
-	return result
-}
-
-// Inner returns the `[]interface{}` which this `Array` represents, or a propagated error
+// Inner returns the `map[string]interface{}` which this `Map` represents, or a propagated error
 func (m Map) Inner() (map[string]interface{}, error) {
 	if m.err != nil {
 		return nil, m.err
 	}
 	return m.m, nil
-}
-
-// MustInner returns the `[]interface{}` which this `Array` represents, or panics if there was an error
-func (m Map) MustInner() map[string]interface{} {
-	m.panicOnErr()
-	return m.m
 }

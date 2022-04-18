@@ -132,17 +132,6 @@ returns a struct that holds on to that error and finally returns it when you cal
 like `Float(...)`. Meanwhile, it also builds up and keeps track of the path so that if any error does happen, you'll
 know exactly where to look!
 
-### But I really hate checking for errors... now what?
-
-OK, what if you're really confident the value is there, need to send it to another function, and are willing to let it
-panic if something went wrong?  That's what the `Must*` versions of all the functions that return errors are for!
-
-```go
-processScore(luna.MapFromBytes(data).Array("people").Map(0).MustFloat("score"))
-```
-
-Even with this approach, the panic will contain the same useful information you would get using the other methods.
-
 ### So what's the full interface?
 
 [Check it out](https://pkg.go.dev/github.com/mikecoop83/luna)...
