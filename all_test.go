@@ -54,12 +54,6 @@ func TestArrayLen(t *testing.T) {
 	require.Equal(t, 2, l)
 }
 
-func TestArrayMustLen(t *testing.T) {
-	m := MapFromBytes(simpleJson)
-	l := m.Map("object").Array("arrayStrKey").MustLen()
-	require.Equal(t, 2, l)
-}
-
 func TestMissingArrayLen(t *testing.T) {
 	m := MapFromBytes(simpleJson)
 	notFound := m.Array("missing")
@@ -67,15 +61,6 @@ func TestMissingArrayLen(t *testing.T) {
 	l, err := notFound.Len()
 	require.Error(t, err)
 	require.Equal(t, 0, l)
-}
-
-func TestMissingArrayMustLen(t *testing.T) {
-	m := MapFromBytes(simpleJson)
-	notFound := m.Array("missing")
-	require.Error(t, notFound.Err())
-	require.Panics(t, func() {
-		notFound.MustLen()
-	})
 }
 
 func TestMissingMapError(t *testing.T) {

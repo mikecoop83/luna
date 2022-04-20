@@ -87,14 +87,6 @@ func (a Array) Array(idx int) Array {
 	return Array{result, currPath, nil}
 }
 
-// MustLen returns the length of the array, or panics if there was an error
-func (a Array) MustLen() int {
-	if a.err != nil {
-		panic(a.err)
-	}
-	return len(a.a)
-}
-
 // String returns the value of a string at index `idx` in the array, or a propagated error
 func (a Array) String(idx int) (string, error) {
 	if a.err != nil {
@@ -155,18 +147,6 @@ func (a Array) Bytes() ([]byte, error) {
 	return buf, nil
 }
 
-// MustBytes returns the serialized value into a slice of bytes, or panics if there was an error
-func (a Array) MustBytes() []byte {
-	if a.err != nil {
-		panic(a.err)
-	}
-	result, err := json.Marshal(a.a)
-	if err != nil {
-		panic(err)
-	}
-	return result
-}
-
 // Inner returns the `[]interface{}` which this `Array` represents, or a propagated error
 func (a Array) Inner() ([]interface{}, error) {
 	if a.err != nil {
@@ -175,56 +155,12 @@ func (a Array) Inner() ([]interface{}, error) {
 	return a.a, nil
 }
 
-// MustInner returns the `[]interface{}` which this `Array` represents, or panics if there was an error
-func (a Array) MustInner() []interface{} {
-	if a.err != nil {
-		panic(a.err)
-	}
-	return a.a
-}
-
 // Len returns the length of the array, or a propagated error
 func (a Array) Len() (int, error) {
 	if a.err != nil {
 		return 0, a.err
 	}
 	return len(a.a), nil
-}
-
-// MustString returns the value of a string at index `idx` in the array, or panics if there was an error
-func (a Array) MustString(idx int) string {
-	if a.err != nil {
-		panic(a.err)
-	}
-	s, err := a.String(idx)
-	if err != nil {
-		panic(err)
-	}
-	return s
-}
-
-// MustFloat returns the value of a float at index `idx` in the array, or panics if there was an error
-func (a Array) MustFloat(idx int) float64 {
-	if a.err != nil {
-		panic(a.err)
-	}
-	f, err := a.Float(idx)
-	if err != nil {
-		panic(err)
-	}
-	return f
-}
-
-// MustBool returns the value of a bool at index `idx` in the array, or panics if there was an error
-func (a Array) MustBool(idx int) bool {
-	if a.err != nil {
-		panic(a.err)
-	}
-	b, err := a.Bool(idx)
-	if err != nil {
-		panic(err)
-	}
-	return b
 }
 
 // Err returns any error that was found up to this point
