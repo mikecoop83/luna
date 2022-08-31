@@ -3,7 +3,7 @@ ___
 
 ## Goal
 
-The intent of **luna** is to create an simpler interface to work with when parsing JSON in Go without having to
+The intent of **luna** is to create a simpler interface to work with when parsing JSON in Go without having to
 create a bunch of structs with tags.
 
 Features include:
