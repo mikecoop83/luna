@@ -111,7 +111,6 @@ conveniently contains the full path to where the error happened along with the v
 
 As another example, showing the power of the error propagation, what if we got the `people` key wrong and used `folks`?
 
-But what if we got the key wrong and used `"grade"` instead of `"score"`?
 ```go
 score, err := luna.MapFromBytes(data).Array("folks").Map(0).Float("grade")
 if err != nil {
