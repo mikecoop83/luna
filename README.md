@@ -11,7 +11,6 @@ Features include:
  * An interface that propagates errors until you finally extract a value to use
  * More detailed error messages that give valuable debugging information (such as other keys in the map when a key
 is not found)
- * Equivalent versions of value-retrieving functions to panic on error (but allow nesting results inside function calls)
 
 ## Motivation
 
